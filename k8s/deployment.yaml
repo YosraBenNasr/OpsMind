@@ -1,0 +1,30 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: opsmind-app
+  namespace: opsmind
+  labels:
+    app: opsmind-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: opsmind-app
+  template:
+    metadata:
+      labels:
+        app: opsmind-app
+    spec:
+      containers:
+      - name: opsmind-app
+        image: opsmind-app:v1
+        imagePullPolicy: Never
+        ports:
+        - containerPort: 8000
+        resources:
+          requests:
+            memory: "64Mi"
+            cpu: "250m"
+          limits:
+            memory: "128Mi"
+            cpu: "500m"
