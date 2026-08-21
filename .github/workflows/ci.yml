@@ -74,3 +74,41 @@ jobs:
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
+
+  update-manifests:
+    name: 📝 Update K8s Manifest Image Tag
+    needs: build-and-push
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Extract Short Commit SHA
+        id: vars
+        run: echo "SHORT_SHA=${GITHUB_SHA::7}" >> $GITHUB_ENV
+
+      - name: Update Image Tag in Deployment Manifest
+        run: |
+          # Utilisation de sed pour mettre à jour le tag image vers le SHA court du commit
+          sed -i -E "s|(image: ghcr.io/${{ github.repository }}):.*|\1:${{ env.SHORT_SHA }}|g" k8s/deployment.yaml
+
+      - name: Commit and Push Changes
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          
+          git add k8s/deployment.yaml
+          
+          # Vérifier s'il y a des changements avant de commiter
+          if git diff --staged --quiet; then
+            echo "Aucune modification du manifeste détectée."
+          else
+            git commit -m "chore(k8s): update app image tag to ${{ env.SHORT_SHA }} [skip ci]"
+            git push origin main
+          fi
