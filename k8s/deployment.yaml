@@ -6,7 +6,7 @@ metadata:
   labels:
     app: opsmind-app
 spec:
-  replicas: "invalid_number" # Doit être un entier (integer)
+  replicas: 1
   selector:
     matchLabels:
       app: opsmind-app
