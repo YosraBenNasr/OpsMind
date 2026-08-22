@@ -1,0 +1,23 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: opsmind-app
+  namespace: argocd
+  # Optionnel : ajouter un finalizer pour nettoyer les ressources Kubernetes si l'application ArgoCD est supprimée
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  project: default
+  source:
+    repoURL: 'https://github.com/YosraBenNasr/OpsMind.git' # Remplace par l'URL HTTPS exacte de ton dépôt GitHub
+    targetRevision: HEAD # Suit la branche principale (main)
+    path: k8s # Dossier contenant les manifests de ton application (deployment, service, etc.)
+  destination:
+    server: 'https://kubernetes.default.svc' # Le cluster Minikube local
+    namespace: opsmind # Le namespace où sera déployée l'application
+  syncPolicy:
+    automated:
+      prune: true     # Supprime automatiquement les ressources K8s qui n'existent plus dans Git
+      selfHeal: true  # Rétablit la configuration Git si une modification manuelle survient sur le cluster
+    syncOptions:
+      - CreateNamespace=true # Crée automatiquement le namespace 'opsmind' s'il n'existe pas encore
