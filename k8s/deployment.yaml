@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
       - name: opsmind-app
-        image: ghcr.io/YosraBenNasr/OpsMind:e8b952b
+        image: ghcr.io/yosrabennasr/opsmind:d3cc524
         ports:
         - containerPort: 8000
         resources:
