@@ -96,7 +96,8 @@ jobs:
       - name: Update Image Tag in Deployment Manifest
         run: |
           # Utilisation de sed pour mettre à jour le tag image vers le SHA court du commit
-          sed -i -E "s|(image: ghcr.io/${{ github.repository }}):.*|\1:${{ env.SHORT_SHA }}|g" k8s/deployment.yaml
+          # Remplace n'importe quelle image ghcr.io dans k8s/deployment.yaml par le bon tag SHA
+          sed -i -E "s|image: ghcr.io/.*|image: ghcr.io/${{ github.repository }}:${{ env.SHORT_SHA }}|g" k8s/deployment.yaml
 
       - name: Commit and Push Changes
         run: |
@@ -112,3 +113,5 @@ jobs:
             git commit -m "chore(k8s): update app image tag to ${{ env.SHORT_SHA }} [skip ci]"
             git push origin main
           fi
+
+          
