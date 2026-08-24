@@ -96,12 +96,8 @@ jobs:
       - name: Update Image Tag in Deployment Manifest
         run: |
           # Utilisation de sed pour mettre à jour le tag image vers le SHA court du commit
-          # Convertir le nom du repository en minuscules
-          REPO_LOWER=$(echo "${{ github.repository }}" | tr '[:upper:]' '[:lower:]')
-          
-          # Appliquer le tag en minuscules dans le déploiement
-          sed -i -E "s|image: ghcr.io/.*|image: ghcr.io/${REPO_LOWER}:${{ env.SHORT_SHA }}|g" k8s/deployment.yaml
-          
+          sed -i -E "s|(image: ghcr.io/${{ github.repository }}):.*|\1:${{ env.SHORT_SHA }}|g" k8s/deployment.yaml
+
       - name: Commit and Push Changes
         run: |
           git config --global user.name "github-actions[bot]"
